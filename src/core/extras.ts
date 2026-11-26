@@ -1,4 +1,4 @@
-import RNFS from '@dr.pogodin/react-native-fs';
+import RNFS from 'react-native-fs';
 import type { SubtitleCue, SubtitleOption, VideoInfo, VideoPage } from '../shared/types';
 
 /** 简单路径拼接（RN 端路径统一用 / 分隔） */

@@ -1,4 +1,4 @@
-import RNFS from '@dr.pogodin/react-native-fs';
+import RNFS from 'react-native-fs';
 import { buildFileName } from '../shared/bilibili';
 import type { DownloadRequest, DownloadTask, VideoInfo, VideoPage } from '../shared/types';
 import { BilibiliClient, type MediaStream, type PlaySelection } from './bilibili';
