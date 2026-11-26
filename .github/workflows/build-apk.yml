@@ -54,6 +54,13 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
+      - name: Download FFmpeg AAR
+        run: |
+          mkdir -p android/libs
+          curl -fL --retry 3 -o android/libs/ffmpeg-kit-https.aar \
+            https://github.com/2004durgesh/react-native-ffmpeg-kit/releases/download/ffmpeg-android-6.0.3/ffmpeg-kit-https.aar
+          ls -lh android/libs/ffmpeg-kit-https.aar
+
       - name: Build Release APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
