@@ -63,3 +63,18 @@ const patchedBlock = `dependencies {
 content = content.slice(0, depStart) + patchedBlock;
 fs.writeFileSync(gradlePath, content, 'utf8');
 console.log('[patch-ffmpeg] patched ffmpeg-kit-react-native to use local aar');
+
+// RNFS 在旧架构下仍无条件注册 codegen 任务，而其 TurboModule 规范含 ArrayBuffer，
+// 与 RN 0.79 的 codegen 不兼容。旧架构下 RNFS 用 Java 实现，不需要 codegen，
+// 因此移除 package.json 中的 codegenConfig 以跳过该任务。
+const rnfsPkgPath = path.join(__dirname, '..', 'node_modules', '@dr.pogodin', 'react-native-fs', 'package.json');
+if (fs.existsSync(rnfsPkgPath)) {
+  const pkg = JSON.parse(fs.readFileSync(rnfsPkgPath, 'utf8'));
+  if (pkg.codegenConfig) {
+    delete pkg.codegenConfig;
+    fs.writeFileSync(rnfsPkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+    console.log('[patch-ffmpeg] removed RNFS codegenConfig (old architecture)');
+  } else {
+    console.log('[patch-ffmpeg] RNFS codegenConfig already removed');
+  }
+}
