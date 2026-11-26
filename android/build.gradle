@@ -19,3 +19,13 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// react-native-ffmpeg-kit 会从 android/libs/*.aar 读取本地 FFmpeg 二进制，
+// 这里声明 flatDir 仓库让 Gradle 能解析 implementation(name:..., ext: 'aar') 形式的依赖。
+allprojects {
+    repositories {
+        flatDir {
+            dirs "${rootProject.projectDir}/libs"
+        }
+    }
+}
