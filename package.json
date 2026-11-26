@@ -16,7 +16,7 @@
     "react": "19.0.0",
     "react-native": "0.79.5",
     "react-native-qrcode-svg": "^6.3.2",
-    "react-native-svg": "^15.11.2",
+    "react-native-svg": "^15.16.1",
     "ffmpeg-kit-react-native": "^6.0.2"
   },
   "devDependencies": {
