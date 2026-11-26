@@ -53,7 +53,7 @@ const patchedBlock = `dependencies {
   def aarDir = new File(rootProject.projectDir, 'libs')
   def localAar = aarDir.listFiles()?.find { it.name.startsWith('ffmpeg-kit-') && it.name.endsWith('.aar') }
   if (localAar) {
-    implementation(name: localAar.name.substring(0, localAar.name.length - 4), ext: 'aar')
+    implementation(name: localAar.name.substring(0, localAar.name.length() - 4), ext: 'aar')
   } else {
     implementation 'com.arthenica:ffmpeg-kit-' + safePackageName(safeExtGet('ffmpegKitPackage', 'https')) + ':' + safePackageVersion(safeExtGet('ffmpegKitPackage', 'https'))
   }
