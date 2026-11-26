@@ -1,97 +1,50 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# DownKyi Android
 
-# Getting Started
+B 站视频下载器的安卓版本，基于 React Native 0.79。功能与桌面端对齐：扫码登录、画质选择、多分集批量下载、断点续传、字幕/弹幕/封面/NFO 元数据。
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 功能
 
-## Step 1: Start Metro
+- **链接解析**：支持 b23.tv 短链、完整链接、分享文本、BV/av 号
+- **画质选择**：读取实际 DASH 流，标注分辨率；多分集取画质交集
+- **下载管理**：并发控制、进度/速度显示、暂停/继续/重试/删除、断点续传（HTTP Range）
+- **音视频合并**：ffmpeg-kit 原生合并 `-c copy`，无需重编码
+- **附加内容**：AI 字幕（SRT）、弹幕（ASS）、封面（poster.jpg）、NFO 元数据
+- **扫码登录**：哔哩哔哩 App 扫码，Cookie 持久化到本地
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 下载 APK
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+进入 [Releases](../../releases) 页面下载最新 `downkyi-android-release.apk`（打 tag `v*` 会自动构建并发布）。
 
-```sh
-# Using npm
-npm start
+也可以在 Actions 页面手动触发 `Build Android APK`，构建产物在 Artifacts 中。
 
-# OR using Yarn
-yarn start
+## 本地开发
+
+需要 Node 20+、JDK 17、Android SDK（API 35）。
+
+```bash
+npm install
+npm run typecheck
+npx react-native run-android
 ```
 
-## Step 2: Build and run your app
+用 Android Studio 打开 `android/` 目录也可以直接构建。
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 技术说明
 
-### Android
+| 功能 | 实现 |
+|---|---|
+| 网络请求 | RN `fetch`（B 站 Web API，带 Cookie/Referer/UA） |
+| 文件下载 | `@dr.pogodin/react-native-fs` 原生下载 + Range 断点续传 |
+| 音视频合并 | `ffmpeg-kit-react-native`（https 包，`-c copy`） |
+| 持久化 | `@react-native-async-storage/async-storage` |
+| 二维码 | `react-native-qrcode-svg` |
+| UI | React Native 原生组件（StyleSheet） |
 
-```sh
-# Using npm
-npm run android
+下载文件默认保存在 App 专属目录（`DocumentDirectoryPath/DownKyi`），安卓 10+ 的 Scoped Storage 限制下无需额外权限。
 
-# OR using Yarn
-yarn android
-```
+## 已知限制
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- 充电专属内容无法下载（需登录并对 UP 主充电，本项目不绕过付费限制）
+- 下载目录暂固定为 App 专属目录，SAF 自定义目录选择留待后续版本
+- 后台下载使用 RNFS 的 background 选项，长时间后台可能被系统限制
+- Release APK 使用 debug keystore 签名（便于自动构建），适合个人使用
