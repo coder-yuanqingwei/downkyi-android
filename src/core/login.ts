@@ -110,7 +110,7 @@ async function fetchWithRetry(url: string, headers: Record<string, string>, atte
       return await fetch(url, { headers });
     } catch (error) {
       lastError = error;
-      if (i < attempts - 1) await new Promise((resolve) => setTimeout(resolve, 400 * (i + 1)));
+      if (i < attempts - 1) await new Promise<void>((resolve) => setTimeout(() => resolve(), 400 * (i + 1)));
     }
   }
   throw lastError instanceof Error ? lastError : new Error('网络请求失败');

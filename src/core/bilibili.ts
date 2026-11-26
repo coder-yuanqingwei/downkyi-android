@@ -80,14 +80,20 @@ export interface PlaySelection {
   file?: MediaStream;
 }
 
-/** ArrayBuffer → base64（RN 无 Buffer，封面等小文件用 base64 传给文件系统） */
+/** ArrayBuffer → base64（纯 JS 实现，不依赖 Buffer/btoa） */
 function bytesToBase64(bytes: Uint8Array): string {
-  const chunk = 0x8000;
-  let binary = '';
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const a = bytes[i];
+    const b = bytes[i + 1];
+    const c = bytes[i + 2];
+    out += chars[a >> 2];
+    out += chars[((a & 3) << 4) | ((b ?? 0) >> 4)];
+    out += b === undefined ? '=' : chars[((b & 15) << 2) | ((c ?? 0) >> 6)];
+    out += c === undefined ? '=' : chars[c & 63];
   }
-  return globalThis.btoa ? globalThis.btoa(binary) : Buffer.from(bytes).toString('base64');
+  return out;
 }
 
 export class BilibiliClient {
@@ -98,7 +104,7 @@ export class BilibiliClient {
     // 兼容分享文本（如「【标题-哔哩哔哩】 https://b23.tv/xxx」）：先提取出纯链接
     value = extractFirstUrl(value) ?? value;
     if (isBilibiliShortLink(value)) {
-      const response = await fetch(value, { headers: this.headers(), redirect: 'follow' });
+      const response = await fetch(value, { headers: this.headers() });
       if (!response.ok) throw new Error('短链接解析失败，请稍后重试');
       value = response.url;
     }
@@ -276,7 +282,7 @@ export class BilibiliClient {
       if (!response.ok) throw new Error(`网络请求失败 (${response.status})`);
       const body = (await response.json()) as BiliResponse<T>;
       if (body.code === 87008 && attempt < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+        await new Promise<void>((resolve) => setTimeout(() => resolve(), attempt * 1500));
         continue;
       }
       if (body.code !== 0) {

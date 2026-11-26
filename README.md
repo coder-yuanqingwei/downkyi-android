@@ -35,7 +35,7 @@ npx react-native run-android
 |---|---|
 | 网络请求 | RN `fetch`（B 站 Web API，带 Cookie/Referer/UA） |
 | 文件下载 | `@dr.pogodin/react-native-fs` 原生下载 + Range 断点续传 |
-| 音视频合并 | `ffmpeg-kit-react-native`（https 包，`-c copy`） |
+| 音视频合并 | `react-native-ffmpeg-kit`（社区维护版，https 包，`-c copy`） |
 | 持久化 | `@react-native-async-storage/async-storage` |
 | 二维码 | `react-native-qrcode-svg` |
 | UI | React Native 原生组件（StyleSheet） |

@@ -1,4 +1,4 @@
-import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
+import { FFmpegKit, ReturnCode } from 'react-native-ffmpeg-kit';
 
 /** FFmpeg 可用性：ffmpeg-kit 是随 app 打包的原生库，始终可用 */
 export async function checkFfmpeg(): Promise<boolean> {
