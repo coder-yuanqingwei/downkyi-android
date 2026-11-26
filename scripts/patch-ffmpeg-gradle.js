@@ -22,27 +22,44 @@ if (!fs.existsSync(gradlePath)) {
 
 let content = fs.readFileSync(gradlePath, 'utf8');
 const marker = '// PATCHED: local aar from android/libs';
+
+// 幂等：若已打过补丁，先移除补丁块（保留原有 dependencies 声明），再重新打
 if (content.includes(marker)) {
-  console.log('[patch-ffmpeg] already patched');
+  const patchedMark = `  ${marker}`;
+  const idx = content.indexOf(patchedMark);
+  if (idx !== -1) {
+    // 补丁块从 marker 前一行开始，到其对应的闭合 } 结束；简单起见截到 dependencies 块起始
+    const before = content.slice(0, idx);
+    const depIdxs = [...before.matchAll(/^dependencies \{/gm)];
+    const depIdx = depIdxs.length ? depIdxs[depIdxs.length - 1].index : -1;
+    if (depIdx !== -1) {
+      content = content.slice(0, depIdx) + 'dependencies {\n  api \'com.facebook.react:react-native:+\'\n}\n';
+    }
+  }
+}
+
+// 只匹配行首无缩进的 dependencies 块（buildscript 内的那个带缩进）
+const depMatches = [...content.matchAll(/^dependencies \{/gm)];
+const depStart = depMatches.length ? depMatches[depMatches.length - 1].index : -1;
+if (depStart === -1) {
+  console.warn('[patch-ffmpeg] dependencies block not found, patch skipped');
   process.exit(0);
 }
 
-const original = `  implementation 'com.arthenica:ffmpeg-kit-' + safePackageName(safeExtGet('ffmpegKitPackage', 'https')) + ':' + safePackageVersion(safeExtGet('ffmpegKitPackage', 'https'))`;
-const patched = `  ${marker}
+const patchedBlock = `dependencies {
+  api 'com.facebook.react:react-native:+'
+  ${marker}
   // 本地 aar 由 CI 下载到 android/libs/，通过 flatDir 仓库解析
   def aarDir = new File(rootProject.projectDir, 'libs')
   def localAar = aarDir.listFiles()?.find { it.name.startsWith('ffmpeg-kit-') && it.name.endsWith('.aar') }
   if (localAar) {
-    implementation(name: localAar.name.replace(/\\.aar$/, ''), ext: 'aar')
+    implementation(name: localAar.name.substring(0, localAar.name.length - 4), ext: 'aar')
   } else {
     implementation 'com.arthenica:ffmpeg-kit-' + safePackageName(safeExtGet('ffmpegKitPackage', 'https')) + ':' + safePackageVersion(safeExtGet('ffmpegKitPackage', 'https'))
-  }`;
-
-if (!content.includes(original)) {
-  console.warn('[patch-ffmpeg] original dependency line not found, patch skipped');
-  process.exit(0);
+  }
 }
+`;
 
-content = content.replace(original, patched);
+content = content.slice(0, depStart) + patchedBlock;
 fs.writeFileSync(gradlePath, content, 'utf8');
 console.log('[patch-ffmpeg] patched ffmpeg-kit-react-native to use local aar');
