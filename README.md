@@ -13,7 +13,7 @@ B 站视频下载器的安卓版本，基于 React Native 0.79。功能与桌面
 
 ## 下载 APK
 
-进入 [Releases](../../releases) 页面下载最新 `downkyi-android-release.apk`（打 tag `v*` 会自动构建并发布）。
+从 [v0.1.0 Release](https://github.com/coder-yuanqingwei/downkyi-android/releases/tag/v0.1.0) 下载 `downkyi-android-release.apk`（约 128 MB，用 debug keystore 签名，可直接安装）。后续打 tag `v*` 会自动构建并发布新版本。
 
 也可以在 Actions 页面手动触发 `Build Android APK`，构建产物在 Artifacts 中。
 
@@ -34,8 +34,9 @@ npx react-native run-android
 | 功能 | 实现 |
 |---|---|
 | 网络请求 | RN `fetch`（B 站 Web API，带 Cookie/Referer/UA） |
-| 文件下载 | `@dr.pogodin/react-native-fs` 原生下载 + Range 断点续传 |
-| 音视频合并 | `react-native-ffmpeg-kit`（社区维护版，https 包，`-c copy`） |
+| 文件下载 | `react-native-fs` 原生下载 + Range 断点续传 |
+| 音视频合并 | `ffmpeg-kit-react-native` + CI 下载的本地 AAR（官方 Maven 构件已下架，`-c copy`） |
+| 兼容处理 | postinstall 自动 patch FFmpeg 依赖为本地 AAR、改写 svg fabric 类型导入 |
 | 持久化 | `@react-native-async-storage/async-storage` |
 | 二维码 | `react-native-qrcode-svg` |
 | UI | React Native 原生组件（StyleSheet） |
