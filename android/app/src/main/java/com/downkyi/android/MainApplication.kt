@@ -1,4 +1,4 @@
-package com.downkyiandroid
+package com.downkyi.android
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -1,4 +1,4 @@
-package com.downkyiandroid
+package com.downkyi.android
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
